@@ -108,10 +108,14 @@ class FileSelector:
         if dep_graph and hasattr(dep_graph, "get_blast_radius") and git_changed:
             try:
                 blast_radius = dep_graph.get_blast_radius(git_changed, max_depth=4)
+                pruned_count = len(candidates) - len(blast_radius)
                 logger.info(
-                    "Blast radius: %d files affected by %d changes",
-                    len(blast_radius), len(git_changed),
+                    "Blast radius: %d files affected by %d changes, %d files pruned",
+                    len(blast_radius), len(git_changed), max(0, pruned_count),
                 )
+                if pruned_count > 0:
+                    from interro_claw.telemetry import record as _trecord
+                    _trecord("files_pruned_by_blast_radius", max(0, pruned_count))
             except Exception as exc:
                 logger.debug("Blast radius computation skipped: %s", exc)
 

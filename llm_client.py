@@ -56,6 +56,8 @@ class BaseLLMClient(ABC):
             cached = store.cache_get(system_prompt, user_message)
             if cached is not None:
                 logger.info("LLM cache HIT (exact) — skipping API call")
+                from interro_claw.telemetry import record as _trecord
+                _trecord("cache_hits_exact")
                 return cached
 
             # Level 2: task-fingerprint match (strips volatile context)
@@ -63,8 +65,12 @@ class BaseLLMClient(ABC):
             cached = store.cache_get_normalized(tfp)
             if cached is not None:
                 logger.info("LLM cache HIT (fingerprint) — skipping API call")
+                from interro_claw.telemetry import record as _trecord
+                _trecord("cache_hits_fingerprint")
                 return cached
 
+        from interro_claw.telemetry import record as _trecord
+        _trecord("cache_misses")
         response = await self._chat_with_retry(system_prompt, user_message)
 
         if config.ENABLE_RESPONSE_CACHE:

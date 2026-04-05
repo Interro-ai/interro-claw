@@ -39,12 +39,19 @@ def main() -> None:
     parser.add_argument("--create-project", action="store_true", help="Create a new project interactively")
     parser.add_argument("--list-projects", action="store_true", help="List all registered projects")
     parser.add_argument("--verbose", "-v", action="store_true", help="Show detailed multi-agent execution logs")
+    parser.add_argument("--mcp", action="store_true", help="Run as MCP (Model Context Protocol) server")
     parser.add_argument("--version", action="store_true", help="Show version and exit")
     args = parser.parse_args()
 
     if args.version:
         from interro_claw import __version__
         print(f"interro-claw {__version__}")
+        return
+
+    # MCP server mode — run as tool provider and exit
+    if args.mcp:
+        from interro_claw.mcp_server import run_mcp_server
+        run_mcp_server()
         return
 
     # Configure logging level based on --verbose
@@ -139,6 +146,12 @@ def main() -> None:
     report = getattr(orchestrator, "_last_report", None)
     if report:
         print("\n" + report, flush=True)
+
+    # Print token reduction telemetry
+    from interro_claw.telemetry import report as telemetry_report
+    tr = telemetry_report()
+    if tr:
+        print(tr, flush=True)
 
     # Interactive loop
     _interactive_loop(orchestrator)

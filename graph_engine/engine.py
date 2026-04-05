@@ -177,6 +177,9 @@ class ProjectGraphEngine:
             len(new_hashes), len(changed_files), len(removed_files),
             unchanged, "full rebuild" if not cached else "incremental",
         )
+        if unchanged > 0:
+            from interro_claw.telemetry import record as _trecord
+            _trecord("files_skipped_unchanged", unchanged)
 
         # Full rebuild (we still rebuild fully, but now we KNOW what changed
         # and store that info on the graph for downstream blast-radius use)
