@@ -273,7 +273,7 @@ class OllamaClient(BaseLLMClient):
             ],
             "stream": False,
         }
-        async with httpx.AsyncClient(timeout=120) as client:
+        async with httpx.AsyncClient(timeout=120, proxy=None) as client:
             resp = await client.post(f"{self._base_url}/api/chat", json=payload)
             resp.raise_for_status()
             data = resp.json()
@@ -289,7 +289,7 @@ class OllamaClient(BaseLLMClient):
             ],
             "stream": True,
         }
-        async with httpx.AsyncClient(timeout=120) as client:
+        async with httpx.AsyncClient(timeout=120, proxy=None) as client:
             async with client.stream("POST", f"{self._base_url}/api/chat", json=payload) as resp:
                 resp.raise_for_status()
                 async for line in resp.aiter_lines():

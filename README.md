@@ -1,5 +1,10 @@
 # Interro-Claw — Autonomous Development System
 
+[![PyPI version](https://img.shields.io/pypi/v/interro-claw.svg)](https://pypi.org/project/interro-claw/)
+[![Python](https://img.shields.io/pypi/pyversions/interro-claw.svg)](https://pypi.org/project/interro-claw/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Created by Interro-AI](https://img.shields.io/badge/Created%20by-Interro--AI-blue)](https://interr-ai.com)
+
 An open-source, multi-agent AI orchestrator that **plans, builds, tests, secures, refactors, and deploys** software projects from a single CLI command. Works with **Claude, OpenAI, Ollama, or NVIDIA NIM** — cloud or fully local.
 
 | Doc                                                  | What's inside                                                                                                                 |
@@ -9,7 +14,17 @@ An open-source, multi-agent AI orchestrator that **plans, builds, tests, secures
 
 ---
 
-## Installation
+## Quick Start (PyPI)
+
+```bash
+pip install interro-claw
+interro-claw --init          # generates .env, walks you through provider setup
+interro-claw --chat          # start chatting
+```
+
+---
+
+## Installation (from source)
 
 ### Prerequisites
 
@@ -21,7 +36,7 @@ An open-source, multi-agent AI orchestrator that **plans, builds, tests, secures
 
 ```bash
 git clone https://github.com/interro-claw/interro-claw.git
-cd interro-claw
+cd interro-claw/interro_claw
 
 # Create virtual environment
 python -m venv .venv
@@ -35,12 +50,9 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-### Step 2: Install dependencies + Interro-Claw
+### Step 2: Install Interro-Claw
 
 ```bash
-# Install all Python dependencies
-pip install -r requirements.txt
-
 # Install interro-claw as a CLI command (editable mode for development)
 pip install -e .
 
@@ -52,35 +64,128 @@ pip install -e ".[dev]"
 ```
 
 > **What does `pip install -e .` do?**
-> It registers the `interro-claw` command in your terminal. Without it, you'd have to run
-> `python -m interro_claw.cli` every time. After install, just type `interro-claw`.
+> It reads `pyproject.toml`, installs all dependencies, and registers the `interro-claw`
+> command in your terminal. After install, just type `interro-claw`.
 
-### Step 3: Configure your LLM provider
+### Step 3: Set required environment variables
+
+Interro-Claw needs **2 mandatory variables** to work. Everything else is optional.
+
+#### Required Variables
+
+| Variable                  | Description                                                 | Example       |
+| ------------------------- | ----------------------------------------------------------- | ------------- |
+| `LLM_PROVIDER`            | Which LLM to use: `openai`, `claude`, `ollama`, or `nvidia` | `openai`      |
+| API key for your provider | See table below                                             | `sk-proj-...` |
+
+| Provider           | Required API Key Variable | Local?                |
+| ------------------ | ------------------------- | --------------------- |
+| OpenAI             | `OPENAI_API_KEY`          | No — cloud            |
+| Claude (Anthropic) | `CLAUDE_API_KEY`          | No — cloud            |
+| NVIDIA NIM         | `NVIDIA_API_KEY`          | No — cloud            |
+| Ollama             | _(none — no key needed)_  | **Yes — fully local** |
+
+#### Option A: Create a .env file (recommended)
 
 ```bash
-# Option A: Create a .env file in the project root
+# Copy the example file
 cp .env.example .env
-# Edit .env — set LLM_PROVIDER and your API key
 
-# Option B: Set environment variables directly
-# Windows PowerShell:
-$env:LLM_PROVIDER = "claude"
-$env:ANTHROPIC_API_KEY = "sk-ant-..."
-
-# macOS / Linux:
-export LLM_PROVIDER=claude
-export ANTHROPIC_API_KEY=sk-ant-...
-
-# Option C: Just run interro-claw — it will ask you interactively
-interro-claw --chat
+# Edit it — at minimum, set these two lines:
+# LLM_PROVIDER=openai
+# OPENAI_API_KEY=sk-proj-your-key-here
 ```
 
-| Provider             | Variable                                    | Default Model              |
-| -------------------- | ------------------------------------------- | -------------------------- |
-| Claude (Anthropic)   | `LLM_PROVIDER=claude` + `ANTHROPIC_API_KEY` | `claude-sonnet-4-20250514` |
-| OpenAI               | `LLM_PROVIDER=openai` + `OPENAI_API_KEY`    | `gpt-4o`                   |
-| Ollama (local, free) | `LLM_PROVIDER=ollama`                       | `llama3`                   |
-| NVIDIA NIM           | `LLM_PROVIDER=nvidia` + `NVIDIA_API_KEY`    | (per deployment)           |
+#### Option B: Set environment variables directly
+
+```bash
+# Windows PowerShell:
+$env:LLM_PROVIDER = "openai"
+$env:OPENAI_API_KEY = "sk-proj-your-key-here"
+
+# Windows CMD:
+set LLM_PROVIDER=openai
+set OPENAI_API_KEY=sk-proj-your-key-here
+
+# macOS / Linux:
+export LLM_PROVIDER=openai
+export OPENAI_API_KEY=sk-proj-your-key-here
+```
+
+#### Option C: Use Ollama locally (no API key, free)
+
+```bash
+# Windows PowerShell:
+$env:LLM_PROVIDER = "ollama"
+$env:OLLAMA_BASE_URL = "http://127.0.0.1:11434"
+$env:OLLAMA_MODEL = "llama3"
+
+# macOS / Linux:
+export LLM_PROVIDER=ollama
+export OLLAMA_BASE_URL=http://127.0.0.1:11434
+export OLLAMA_MODEL=llama3
+```
+
+> **Corporate network?** If you get `403 URLBlocked` when using Ollama, add:
+> `$env:NO_PROXY = "127.0.0.1,localhost"` (Windows) or `export NO_PROXY=127.0.0.1,localhost` (Linux/Mac)
+
+#### Option D: Just run it — interactive setup
+
+```bash
+interro-claw --chat
+# It will ask you to pick a provider and enter your API key
+```
+
+#### All Environment Variables Reference
+
+<details>
+<summary>Click to expand full variable list</summary>
+
+**LLM Configuration:**
+
+| Variable          | Default                               | Description                               |
+| ----------------- | ------------------------------------- | ----------------------------------------- |
+| `LLM_PROVIDER`    | _(required)_                          | `openai` / `claude` / `ollama` / `nvidia` |
+| `OPENAI_API_KEY`  | _(required for openai)_               | OpenAI API key                            |
+| `OPENAI_MODEL`    | `gpt-4o`                              | OpenAI model name                         |
+| `CLAUDE_API_KEY`  | _(required for claude)_               | Anthropic API key                         |
+| `CLAUDE_MODEL`    | `claude-sonnet-4-20250514`            | Claude model name                         |
+| `NVIDIA_API_KEY`  | _(required for nvidia)_               | NVIDIA NIM API key                        |
+| `NVIDIA_BASE_URL` | `https://integrate.api.nvidia.com/v1` | NVIDIA endpoint                           |
+| `NVIDIA_MODEL`    | `meta/llama-3.3-70b-instruct`         | NVIDIA model                              |
+| `OLLAMA_BASE_URL` | `http://localhost:11434`              | Ollama server URL                         |
+| `OLLAMA_MODEL`    | `llama3`                              | Ollama model name                         |
+
+**Orchestrator:**
+
+| Variable                | Default | Description                                   |
+| ----------------------- | ------- | --------------------------------------------- |
+| `MAX_CONCURRENT_AGENTS` | `2`     | How many agents run in parallel               |
+| `RATE_LIMIT_RPM`        | `20`    | Max LLM requests per minute                   |
+| `LOG_LEVEL`             | `INFO`  | `DEBUG` / `INFO` / `WARNING` / `ERROR`        |
+| `ENABLE_STREAMING`      | `0`     | `1` to stream tokens as they arrive           |
+| `ENABLE_RESPONSE_CACHE` | `1`     | `1` to cache LLM responses                    |
+| `CACHE_TTL_SECONDS`     | `3600`  | Cache expiry (seconds)                        |
+| `MAX_REFLECTION_DEPTH`  | `1`     | Self-critique rounds per agent (0 to disable) |
+| `ENABLE_REFLECTION`     | `1`     | `0` to disable self-reflection entirely       |
+
+**Guardrails:**
+
+| Variable                    | Default | Description                    |
+| --------------------------- | ------- | ------------------------------ |
+| `MAX_TOKENS_PER_CALL`       | `4096`  | Max output tokens per LLM call |
+| `MAX_LLM_CALLS_PER_SESSION` | `200`   | Hard cap on total LLM calls    |
+| `MAX_OUTPUT_CHARS`          | `50000` | Max output size per agent      |
+| `MAX_AGENT_RUNTIME_SECONDS` | `300`   | Timeout per agent              |
+
+**Project:**
+
+| Variable             | Default           | Description                        |
+| -------------------- | ----------------- | ---------------------------------- |
+| `DEFAULT_PROJECT_ID` | `default`         | Default project for memory scoping |
+| `SKILLS_DIR`         | `(auto-detected)` | Custom skills directory path       |
+
+</details>
 
 ### Step 4: Verify installation
 

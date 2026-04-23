@@ -288,6 +288,7 @@ def ensure_llm_configured() -> None:
     # Interactive setup
     print("\n" + "=" * 60)
     print("  INTERRO-CLAW  —  First-Time Setup")
+    print("  by Interro-AI  •  interr-ai.com")
     print("=" * 60)
 
     if not LLM_PROVIDER:

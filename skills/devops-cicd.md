@@ -21,7 +21,44 @@ Code Push → Lint & Format → Unit Tests → Build → Integration Tests → S
 - Pipeline as code: `.github/workflows/`, `azure-pipelines.yml`, `Jenkinsfile`
 - Secrets via pipeline secrets manager (never in repo, never in env files)
 
+## Packaging & Deployment Targets
+
+Choose the packaging strategy based on the deployment target — do NOT default to Docker.
+
+### When to use Docker
+
+- Multi-service architectures needing orchestration (docker-compose, Kubernetes)
+- Custom OS-level dependencies that can't be satisfied by managed services
+- User explicitly requests Docker/container deployment
+- Need for identical dev/staging/prod environments
+
+### When NOT to use Docker
+
+- Simple Python CLI tools → use pyproject.toml + pip install
+- Static websites → use CDN / Azure Static Web Apps / Vercel
+- Mobile apps → use native build systems (Gradle, Xcode)
+- Desktop apps → use platform installers (MSI, AppImage, DMG)
+- Serverless functions → use Azure Functions / AWS Lambda config
+- Libraries → use package registries (PyPI, npm, NuGet)
+
+### Platform-Specific Packaging
+
+| Target           | Packaging                            | Distribution                |
+| ---------------- | ------------------------------------ | --------------------------- |
+| Python app / CLI | pyproject.toml + `[project.scripts]` | `pip install` or PyPI       |
+| .NET app         | .csproj + `dotnet publish`           | Self-contained exe or NuGet |
+| Android          | build.gradle + signing config        | APK/AAB → Play Store        |
+| iOS              | Xcode project + Fastlane             | IPA → App Store             |
+| Windows desktop  | WiX / Inno Setup / MSIX              | MSI installer or winget     |
+| Linux desktop    | AppImage / snap / flatpak / .deb     | Package manager             |
+| Web app (static) | Build script (vite, webpack)         | CDN or Static Web Apps      |
+| Web app (server) | Procfile or systemd unit             | App Service or VM           |
+| Docker           | Dockerfile + docker-compose          | Container registry          |
+| Serverless       | function.json / SAM template         | Azure Functions / Lambda    |
+
 ## Containerization (Docker)
+
+> **Only generate Docker artifacts when the deployment target is "docker" or containers are clearly needed.**
 
 - Use multi-stage builds to minimize image size
 - Base on official slim images (`python:3.12-slim`, `node:20-alpine`)

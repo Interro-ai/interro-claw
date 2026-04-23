@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "interro-claw"
+version = "0.1.0"
+description = "Autonomous Development System — multi-agent AI orchestrator that plans, builds, tests, and deploys software"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    {name = "Interro-AI", email = "contact@interr-ai.com"},
+]
+keywords = ["ai", "agents", "multi-agent", "orchestrator", "llm", "autonomous", "coding", "cli", "openai", "anthropic", "ollama"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Environment :: Console",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "openai>=1.50.0",
+    "anthropic>=0.39.0",
+    "httpx>=0.27.0",
+    "python-dotenv>=1.0.0",
+    "sentry-sdk>=2.0.0",
+]
+
+[project.optional-dependencies]
+mcp = [
+    "mcp>=1.0.0",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.4",
+]
+
+[project.scripts]
+interro-claw = "interro_claw.cli:main"
+
+[project.urls]
+Homepage = "https://interr-ai.com"
+Repository = "https://github.com/interro-claw/interro-claw"
+Documentation = "https://github.com/interro-claw/interro-claw#readme"
+Issues = "https://github.com/interro-claw/interro-claw/issues"
+
+[tool.setuptools.package-dir]
+interro_claw = "."
+
+[tool.setuptools]
+packages = [
+    "interro_claw",
+    "interro_claw.agents",
+    "interro_claw.context_engine",
+    "interro_claw.dag_scheduler",
+    "interro_claw.delegation",
+    "interro_claw.graph_engine",
+    "interro_claw.guardrails_v2",
+    "interro_claw.indexer",
+    "interro_claw.memory",
+    "interro_claw.sandbox",
+]
+
+[tool.setuptools.package-data]
+interro_claw = ["skills/*.md", ".env.example"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100

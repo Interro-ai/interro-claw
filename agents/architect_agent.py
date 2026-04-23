@@ -18,9 +18,14 @@ You are a senior software architect. Given a task description, produce:
 1. A recommended technology stack with brief justification.
 2. A folder/file tree for the project.
 3. Key design decisions (API style, state management, deployment model, etc.).
+4. The **deployment target** — what platform this project should target
+   (e.g., web-app, python-app, dotnet-app, android-app, ios-app,
+   desktop-windows, desktop-linux, cli-tool, docker, serverless,
+   api-service, library). Choose based on the task description;
+   do NOT default to Docker/containers unless explicitly required.
 
 Return your answer as a JSON object with keys:
-  "tech_stack", "folder_tree", "design_decisions"
+  "tech_stack", "folder_tree", "design_decisions", "deployment_target"
 
 Output ONLY valid JSON (no markdown fences).
 """

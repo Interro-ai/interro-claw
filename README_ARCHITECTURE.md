@@ -33,7 +33,7 @@ orchestrator.py                    ← Master controller + DAG-aware task dispat
 ├── skills_manager.py              ← Auto-loads .md skill files into agent prompts
 ├── agent_tools.py                 ← Tool registry (built-in tools agents can invoke)
 ├── project_context.py             ← Project analysis (languages, frameworks, deps)
-├── dep_graph.py                   ← Dependency graph + blast-radius BFS
+├── dep_graph.py                   ← Dependency graph + blast-radius BFSac
 ├── file_selector.py               ← Intelligent file selection with blast-radius scoring
 ├── context_chunker.py             ← AST-aware file chunking
 ├── result_verifier.py             ← 4-axis output verification

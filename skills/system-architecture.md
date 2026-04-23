@@ -43,7 +43,15 @@ When making architecture decisions, evaluate:
 
 - Design for failure: everything will fail, plan for it
 - Use managed services over self-hosted when possible
-- Containers for workloads, serverless for glue code
+- **Choose the right packaging for the target platform** — do NOT default to containers:
+  - Web apps → static hosting (CDN, Azure Static Web Apps) or App Service
+  - Python apps → pip-installable packages with pyproject.toml
+  - .NET apps → self-contained publish or App Service
+  - Mobile apps → native build toolchains (Gradle/Xcode)
+  - CLI tools → pip/npm/cargo installable binaries
+  - Containers → only when the project requires multi-service orchestration,
+    custom runtimes, or the user explicitly requests Docker
+  - Serverless → for event-driven, low-traffic, or glue-code workloads
 - Infrastructure as Code: Bicep, Terraform, or Pulumi — never manual changes
 - 12-Factor App methodology for configuration, logging, statelessness
 

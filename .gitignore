@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# Virtual environments
+.venv/
+.test_venv/
+myenv/
+testenv/
+
+# Environment files (contain secrets — NEVER commit)
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Runtime artifacts
+*.db
+*.log
+artifacts/
+interro_claw_output/
+
+# Memory runtime data
+memory/runtime/
+memory/global/
+memory/projects/*/

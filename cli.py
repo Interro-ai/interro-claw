@@ -39,6 +39,7 @@ def main() -> None:
     parser.add_argument("--create-project", action="store_true", help="Create a new project interactively")
     parser.add_argument("--list-projects", action="store_true", help="List all registered projects")
     parser.add_argument("--verbose", "-v", action="store_true", help="Show detailed multi-agent execution logs")
+    parser.add_argument("--init", action="store_true", help="Generate .env config file in current directory (first-time setup)")
     parser.add_argument("--mcp", action="store_true", help="Run as MCP (Model Context Protocol) server")
     parser.add_argument("--version", action="store_true", help="Show version and exit")
     args = parser.parse_args()
@@ -46,6 +47,13 @@ def main() -> None:
     if args.version:
         from interro_claw import __version__
         print(f"interro-claw {__version__}")
+        print(f"https://github.com/interro-claw/interro-claw")
+        print(f"Created by Interro-AI  •  interr-ai.com")
+        return
+
+    # --init: generate .env from bundled .env.example
+    if args.init:
+        _init_env()
         return
 
     # MCP server mode — run as tool provider and exit
@@ -183,6 +191,81 @@ def _setup_logging(verbose: bool = False) -> None:
         print("  [verbose] Detailed multi-agent logs enabled\n", flush=True)
 
 
+def _init_env() -> None:
+    """Generate a .env file in the current directory from the bundled .env.example.
+
+    If .env already exists, ask before overwriting. Then walk the user through
+    picking a provider and entering their API key, writing the result directly
+    into the new .env so it's ready to use immediately.
+    """
+    import shutil
+
+    target = os.path.join(os.getcwd(), ".env")
+    if os.path.exists(target):
+        print(f"\n  .env already exists at: {target}")
+        overwrite = input("  Overwrite? [y/N]: ").strip().lower()
+        if overwrite not in ("y", "yes"):
+            print("  Keeping existing .env. Done.")
+            return
+
+    # Copy bundled .env.example → .env
+    example = os.path.join(os.path.dirname(__file__), ".env.example")
+    if not os.path.exists(example):
+        print("  ERROR: .env.example not found in the package.")
+        print("  Download it from: https://github.com/interro-claw/interro-claw")
+        sys.exit(1)
+
+    shutil.copy2(example, target)
+    print(f"\n  Created: {target}")
+
+    # Interactive provider selection
+    print("\n  Let's configure your LLM provider.")
+    print("  (You can always edit .env later.)\n")
+    print("    1. openai    — OpenAI GPT-4o  (requires API key)")
+    print("    2. claude    — Anthropic Claude  (requires API key)")
+    print("    3. nvidia    — NVIDIA NIM  (requires API key)")
+    print("    4. ollama    — Local Ollama  (no API key, free)")
+    print()
+
+    providers = {"1": "openai", "2": "claude", "3": "nvidia", "4": "ollama"}
+    key_vars = {"openai": "OPENAI_API_KEY", "claude": "CLAUDE_API_KEY", "nvidia": "NVIDIA_API_KEY"}
+
+    pick = input("  Enter choice [1-4] (or press Enter to skip): ").strip()
+    provider = providers.get(pick)
+    if not provider:
+        print("\n  Skipped provider setup. Edit .env manually before running.")
+        print(f"  File: {target}")
+        return
+
+    # Write provider into .env
+    _replace_in_file(target, "LLM_PROVIDER=openai", f"LLM_PROVIDER={provider}")
+    print(f"  Provider: {provider}")
+
+    # Ask for API key (if needed)
+    key_var = key_vars.get(provider)
+    if key_var:
+        import getpass
+        api_key = getpass.getpass(f"  {key_var}= ").strip()
+        if api_key:
+            _replace_in_file(target, f"{key_var}=", f"{key_var}={api_key}")
+            print(f"  API key saved.")
+        else:
+            print(f"  No key entered. Set {key_var} in .env before running.")
+
+    print(f"\n  Done! Run 'interro-claw --chat' to get started.")
+    print(f"  Config: {target}")
+
+
+def _replace_in_file(filepath: str, old: str, new: str) -> None:
+    """Replace the first occurrence of *old* with *new* in a text file."""
+    text = open(filepath, encoding="utf-8").read()
+    # Match line that starts with old (could have value after =)
+    import re
+    pattern = re.escape(old.split("=")[0]) + r"=.*"
+    text = re.sub(pattern, new, text, count=1)
+    open(filepath, "w", encoding="utf-8").write(text)
+
+
 def _print_config_info(config) -> None:
     """Always show the user which provider/config is in use.
 
@@ -198,10 +281,12 @@ def _print_config_info(config) -> None:
     if os.path.exists(home_env):
         env_sources.append(f"HOME ({home_env})")
 
-    print(f"\n  interro-claw v{__version__}")
+    print(f"\n  interro-claw v{__version__}  •  by Interro-AI (interr-ai.com)")
     print(f"  Provider : {config.LLM_PROVIDER or '<not set>'}")
     if env_sources:
         print(f"  .env from: {' > '.join(env_sources)}")
+    else:
+        print(f"  .env from: (none found — run 'interro-claw --init' to create one)")
     print(f"  Output   : {os.path.abspath(config.USER_APP_DIR)}")
     print(f"  Logs     : {config.LOG_DIR}")
     print()
