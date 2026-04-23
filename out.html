@@ -1,0 +1,710 @@
+<h1>Interro-Claw — Autonomous Development System</h1>
+<p><a href="https://pypi.org/project/interro-claw/" rel="nofollow"><img src="https://img.shields.io/pypi/v/interro-claw.svg" alt="PyPI version"></a>
+<a href="https://pypi.org/project/interro-claw/" rel="nofollow"><img src="https://img.shields.io/pypi/pyversions/interro-claw.svg" alt="Python"></a>
+<a href="LICENSE" rel="nofollow"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+<a href="https://interr-ai.com" rel="nofollow"><img src="https://img.shields.io/badge/Created%20by-Interro--AI-blue" alt="Created by Interro-AI"></a></p>
+<p>An open-source, multi-agent AI orchestrator that <strong>plans, builds, tests, secures, refactors, and deploys</strong> software projects from a single CLI command. Works with <strong>Claude, OpenAI, Ollama, or NVIDIA NIM</strong> — cloud or fully local.</p>
+<table>
+<thead>
+<tr>
+<th>Doc</th>
+<th>What's inside</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><a href="README_ARCHITECTURE.md" rel="nofollow">README_ARCHITECTURE.md</a></strong></td>
+<td>System architecture, execution pipeline, project structure, configuration reference, DAG scheduling, agent internals</td>
+</tr>
+<tr>
+<td><strong><a href="README_FEATURES.md" rel="nofollow">README_FEATURES.md</a></strong></td>
+<td>All 26 features explained in detail, USP comparison table (30 dimensions vs 6 competitors), token telemetry, MCP server guide</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Quick Start (PyPI)</h2>
+<pre lang="bash">pip<span class="w"> </span>install<span class="w"> </span>interro-claw
+interro-claw<span class="w"> </span>--init<span class="w">          </span><span class="c1"># generates .env, walks you through provider setup</span>
+interro-claw<span class="w"> </span>--chat<span class="w">          </span><span class="c1"># start chatting</span>
+</pre>
+<hr>
+<h2>Installation (from source)</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li><strong>Python 3.11+</strong> — check with <code>python --version</code></li>
+<li><strong>Rust toolchain</strong> — <a href="https://rustup.rs/" rel="nofollow">install Rust</a> (needed for pydantic-core build)</li>
+<li><strong>Microsoft C++ Build Tools</strong> — <a href="https://visualstudio.microsoft.com/visual-cpp-build-tools/" rel="nofollow">download</a> (Windows only)</li>
+</ul>
+<h3>Step 1: Clone and set up virtual environment</h3>
+<pre lang="bash">git<span class="w"> </span>clone<span class="w"> </span>https://github.com/interro-claw/interro-claw.git
+<span class="nb">cd</span><span class="w"> </span>interro-claw/interro_claw
+
+<span class="c1"># Create virtual environment</span>
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+
+<span class="c1"># Activate it</span>
+<span class="c1"># Windows PowerShell:</span>
+.<span class="se">\.</span>venv<span class="se">\S</span>cripts<span class="se">\A</span>ctivate.ps1
+<span class="c1"># Windows CMD:</span>
+.<span class="se">\.</span>venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate.bat
+<span class="c1"># macOS / Linux:</span>
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+</pre>
+<h3>Step 2: Install Interro-Claw</h3>
+<pre lang="bash"><span class="c1"># Install interro-claw as a CLI command (editable mode for development)</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+
+<span class="c1"># (Optional) Install with MCP server support</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[mcp]"</span>
+
+<span class="c1"># (Optional) Install with dev tools (pytest, ruff)</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev]"</span>
+</pre>
+<blockquote>
+<p><strong>What does <code>pip install -e .</code> do?</strong>
+It reads <code>pyproject.toml</code>, installs all dependencies, and registers the <code>interro-claw</code>
+command in your terminal. After install, just type <code>interro-claw</code>.</p>
+</blockquote>
+<h3>Step 3: Set required environment variables</h3>
+<p>Interro-Claw needs <strong>2 mandatory variables</strong> to work. Everything else is optional.</p>
+<h4>Required Variables</h4>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LLM_PROVIDER</code></td>
+<td>Which LLM to use: <code>openai</code>, <code>claude</code>, <code>ollama</code>, or <code>nvidia</code></td>
+<td><code>openai</code></td>
+</tr>
+<tr>
+<td>API key for your provider</td>
+<td>See table below</td>
+<td><code>sk-proj-...</code></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Required API Key Variable</th>
+<th>Local?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenAI</td>
+<td><code>OPENAI_API_KEY</code></td>
+<td>No — cloud</td>
+</tr>
+<tr>
+<td>Claude (Anthropic)</td>
+<td><code>CLAUDE_API_KEY</code></td>
+<td>No — cloud</td>
+</tr>
+<tr>
+<td>NVIDIA NIM</td>
+<td><code>NVIDIA_API_KEY</code></td>
+<td>No — cloud</td>
+</tr>
+<tr>
+<td>Ollama</td>
+<td><em>(none — no key needed)</em></td>
+<td><strong>Yes — fully local</strong></td>
+</tr>
+</tbody>
+</table>
+<h4>Option A: Create a .env file (recommended)</h4>
+<pre lang="bash"><span class="c1"># Copy the example file</span>
+cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+
+<span class="c1"># Edit it — at minimum, set these two lines:</span>
+<span class="c1"># LLM_PROVIDER=openai</span>
+<span class="c1"># OPENAI_API_KEY=sk-proj-your-key-here</span>
+</pre>
+<h4>Option B: Set environment variables directly</h4>
+<pre lang="bash"><span class="c1"># Windows PowerShell:</span>
+<span class="nv">$env</span>:LLM_PROVIDER<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"openai"</span>
+<span class="nv">$env</span>:OPENAI_API_KEY<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"sk-proj-your-key-here"</span>
+
+<span class="c1"># Windows CMD:</span>
+<span class="nb">set</span><span class="w"> </span><span class="nv">LLM_PROVIDER</span><span class="o">=</span>openai
+<span class="nb">set</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span>sk-proj-your-key-here
+
+<span class="c1"># macOS / Linux:</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LLM_PROVIDER</span><span class="o">=</span>openai
+<span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span>sk-proj-your-key-here
+</pre>
+<h4>Option C: Use Ollama locally (no API key, free)</h4>
+<pre lang="bash"><span class="c1"># Windows PowerShell:</span>
+<span class="nv">$env</span>:LLM_PROVIDER<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ollama"</span>
+<span class="nv">$env</span>:OLLAMA_BASE_URL<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"http://127.0.0.1:11434"</span>
+<span class="nv">$env</span>:OLLAMA_MODEL<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"llama3"</span>
+
+<span class="c1"># macOS / Linux:</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LLM_PROVIDER</span><span class="o">=</span>ollama
+<span class="nb">export</span><span class="w"> </span><span class="nv">OLLAMA_BASE_URL</span><span class="o">=</span>http://127.0.0.1:11434
+<span class="nb">export</span><span class="w"> </span><span class="nv">OLLAMA_MODEL</span><span class="o">=</span>llama3
+</pre>
+<blockquote>
+<p><strong>Corporate network?</strong> If you get <code>403 URLBlocked</code> when using Ollama, add:
+<code>$env:NO_PROXY = "127.0.0.1,localhost"</code> (Windows) or <code>export NO_PROXY=127.0.0.1,localhost</code> (Linux/Mac)</p>
+</blockquote>
+<h4>Option D: Just run it — interactive setup</h4>
+<pre lang="bash">interro-claw<span class="w"> </span>--chat
+<span class="c1"># It will ask you to pick a provider and enter your API key</span>
+</pre>
+<h4>All Environment Variables Reference</h4>
+<details>
+<summary>Click to expand full variable list</summary>
+<p><strong>LLM Configuration:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LLM_PROVIDER</code></td>
+<td><em>(required)</em></td>
+<td><code>openai</code> / <code>claude</code> / <code>ollama</code> / <code>nvidia</code></td>
+</tr>
+<tr>
+<td><code>OPENAI_API_KEY</code></td>
+<td><em>(required for openai)</em></td>
+<td>OpenAI API key</td>
+</tr>
+<tr>
+<td><code>OPENAI_MODEL</code></td>
+<td><code>gpt-4o</code></td>
+<td>OpenAI model name</td>
+</tr>
+<tr>
+<td><code>CLAUDE_API_KEY</code></td>
+<td><em>(required for claude)</em></td>
+<td>Anthropic API key</td>
+</tr>
+<tr>
+<td><code>CLAUDE_MODEL</code></td>
+<td><code>claude-sonnet-4-20250514</code></td>
+<td>Claude model name</td>
+</tr>
+<tr>
+<td><code>NVIDIA_API_KEY</code></td>
+<td><em>(required for nvidia)</em></td>
+<td>NVIDIA NIM API key</td>
+</tr>
+<tr>
+<td><code>NVIDIA_BASE_URL</code></td>
+<td><code>https://integrate.api.nvidia.com/v1</code></td>
+<td>NVIDIA endpoint</td>
+</tr>
+<tr>
+<td><code>NVIDIA_MODEL</code></td>
+<td><code>meta/llama-3.3-70b-instruct</code></td>
+<td>NVIDIA model</td>
+</tr>
+<tr>
+<td><code>OLLAMA_BASE_URL</code></td>
+<td><code>http://localhost:11434</code></td>
+<td>Ollama server URL</td>
+</tr>
+<tr>
+<td><code>OLLAMA_MODEL</code></td>
+<td><code>llama3</code></td>
+<td>Ollama model name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Orchestrator:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MAX_CONCURRENT_AGENTS</code></td>
+<td><code>2</code></td>
+<td>How many agents run in parallel</td>
+</tr>
+<tr>
+<td><code>RATE_LIMIT_RPM</code></td>
+<td><code>20</code></td>
+<td>Max LLM requests per minute</td>
+</tr>
+<tr>
+<td><code>LOG_LEVEL</code></td>
+<td><code>INFO</code></td>
+<td><code>DEBUG</code> / <code>INFO</code> / <code>WARNING</code> / <code>ERROR</code></td>
+</tr>
+<tr>
+<td><code>ENABLE_STREAMING</code></td>
+<td><code>0</code></td>
+<td><code>1</code> to stream tokens as they arrive</td>
+</tr>
+<tr>
+<td><code>ENABLE_RESPONSE_CACHE</code></td>
+<td><code>1</code></td>
+<td><code>1</code> to cache LLM responses</td>
+</tr>
+<tr>
+<td><code>CACHE_TTL_SECONDS</code></td>
+<td><code>3600</code></td>
+<td>Cache expiry (seconds)</td>
+</tr>
+<tr>
+<td><code>MAX_REFLECTION_DEPTH</code></td>
+<td><code>1</code></td>
+<td>Self-critique rounds per agent (0 to disable)</td>
+</tr>
+<tr>
+<td><code>ENABLE_REFLECTION</code></td>
+<td><code>1</code></td>
+<td><code>0</code> to disable self-reflection entirely</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Guardrails:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MAX_TOKENS_PER_CALL</code></td>
+<td><code>4096</code></td>
+<td>Max output tokens per LLM call</td>
+</tr>
+<tr>
+<td><code>MAX_LLM_CALLS_PER_SESSION</code></td>
+<td><code>200</code></td>
+<td>Hard cap on total LLM calls</td>
+</tr>
+<tr>
+<td><code>MAX_OUTPUT_CHARS</code></td>
+<td><code>50000</code></td>
+<td>Max output size per agent</td>
+</tr>
+<tr>
+<td><code>MAX_AGENT_RUNTIME_SECONDS</code></td>
+<td><code>300</code></td>
+<td>Timeout per agent</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Project:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DEFAULT_PROJECT_ID</code></td>
+<td><code>default</code></td>
+<td>Default project for memory scoping</td>
+</tr>
+<tr>
+<td><code>SKILLS_DIR</code></td>
+<td><code>(auto-detected)</code></td>
+<td>Custom skills directory path</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3>Step 4: Verify installation</h3>
+<pre lang="bash"><span class="c1"># Should print version and CLI help</span>
+interro-claw<span class="w"> </span>--version
+interro-claw<span class="w"> </span>--help
+</pre>
+<p><strong>Troubleshooting:</strong></p>
+<ul>
+<li><code>maturin failed</code> / <code>cargo build</code> errors → Install Rust and C++ Build Tools</li>
+<li><code>interro-claw: command not found</code> → Run <code>pip install -e .</code> again (make sure your venv is active)</li>
+<li><code>ModuleNotFoundError</code> → Make sure you ran <code>pip install -r requirements.txt</code> first</li>
+</ul>
+<hr>
+<h2>Usage Guide</h2>
+<h3>Single-Shot Goal (one command, full agent orchestration)</h3>
+<p>Give Interro-Claw a goal and walk away. It will plan, assign agents, build, test, and verify:</p>
+<pre lang="bash"><span class="c1"># Build a complete project</span>
+interro-claw<span class="w"> </span><span class="s2">"Build a REST API with FastAPI and user authentication"</span>
+
+<span class="c1"># With streaming (see tokens as they arrive)</span>
+interro-claw<span class="w"> </span>--stream<span class="w"> </span><span class="s2">"Create a React dashboard with charts"</span>
+
+<span class="c1"># With verbose logging (see every agent decision, cache hit, telemetry)</span>
+interro-claw<span class="w"> </span>-v<span class="w"> </span><span class="s2">"Add a payment system with Stripe integration"</span>
+</pre>
+<p>After the run completes, generated files are written to <code>artifacts/</code> and a session report is printed.</p>
+<h3>Matrix Mode — Persistent Interactive Session</h3>
+<p>The most powerful mode. Opens a persistent shell where you can type goals, ask questions, and give follow-up instructions — all with full agent orchestration:</p>
+<pre lang="bash">interro-claw<span class="w"> </span>--matrix-mode
+</pre>
+<p><strong>What happens in Matrix Mode:</strong></p>
+<ol>
+<li>You type anything — a goal, a question, or a clarification</li>
+<li>Interro-Claw's LLM classifies your intent:
+<ul>
+<li><strong>Goal</strong> → Full multi-agent orchestration (plan → build → test → verify)</li>
+<li><strong>Chat</strong> → Direct LLM answer (no agents, instant response)</li>
+<li><strong>Clarify</strong> → Asks you for more details before proceeding</li>
+</ul>
+</li>
+<li>Conversation history is maintained across turns</li>
+<li>Type <code>quit</code> or <code>exit</code> to end the session</li>
+</ol>
+<pre><code>&gt; Build a REST API for a todo app
+  [PlannerAgent] Decomposing goal into 6 tasks...
+  [ArchitectAgent] Designing system architecture...
+  [BackendAgent] Writing FastAPI endpoints...
+  ...
+
+&gt; Now add authentication with JWT tokens
+  [PlannerAgent] Updating plan with auth tasks...
+  [SecurityAgent] Reviewing auth implementation...
+  ...
+
+&gt; What files did we create?
+  [Chat] We created the following files:
+  - backend/main.py (FastAPI app)
+  - backend/auth.py (JWT middleware)
+  ...
+
+&gt; quit
+  Session ended. Session ID: abc123def456
+</code></pre>
+<h3>Project Management — Isolate Your Work</h3>
+<p>Each project gets its own memory, sessions, and context. Perfect when working across multiple codebases:</p>
+<pre lang="bash"><span class="c1"># Create a new project (interactive wizard — asks for name, path, description)</span>
+interro-claw<span class="w"> </span>--create-project
+
+<span class="c1"># List all your registered projects</span>
+interro-claw<span class="w"> </span>--list-projects
+
+<span class="c1"># Run a goal scoped to a specific project</span>
+interro-claw<span class="w"> </span>--project<span class="w"> </span>my-api<span class="w"> </span><span class="s2">"Add rate limiting middleware"</span>
+
+<span class="c1"># Matrix mode with project scoping</span>
+interro-claw<span class="w"> </span>--matrix-mode<span class="w"> </span>--project<span class="w"> </span>my-api
+</pre>
+<p><strong>What project IDs do:</strong></p>
+<ul>
+<li>All agent memory, learned patterns, and shared knowledge are scoped to that project</li>
+<li>Sessions are tracked per-project (so <code>--auto-resume</code> picks up the right one)</li>
+<li>File context and dependency graphs are project-specific</li>
+<li>If you don't specify <code>--project</code>, everything goes to the <code>default</code> project</li>
+</ul>
+<h3>Session Resume — Pick Up Where You Left Off</h3>
+<p>Every run gets a unique session ID. You can resume any previous session:</p>
+<pre lang="bash"><span class="c1"># List your recent session IDs</span>
+interro-claw<span class="w"> </span>--get-session
+
+<span class="c1"># Output:</span>
+<span class="c1">#   Session ID                  | Project  | Goal                              | Status</span>
+<span class="c1">#   abc123def456                | my-api   | Build REST API with FastAPI       | completed</span>
+<span class="c1">#   xyz789ghi012                | my-api   | Add authentication with JWT       | incomplete</span>
+<span class="c1">#   ...</span>
+
+<span class="c1"># Resume a specific session by ID</span>
+interro-claw<span class="w"> </span>--resume<span class="w"> </span>xyz789ghi012<span class="w"> </span><span class="s2">"Continue adding JWT authentication"</span>
+
+<span class="c1"># Auto-resume the last incomplete session (no need to remember IDs)</span>
+interro-claw<span class="w"> </span>--auto-resume<span class="w"> </span><span class="s2">"Keep going"</span>
+
+<span class="c1"># Combine with project scoping</span>
+interro-claw<span class="w"> </span>--project<span class="w"> </span>my-api<span class="w"> </span>--auto-resume
+</pre>
+<p><strong>When to use resume:</strong></p>
+<ul>
+<li>Your terminal crashed or you closed it mid-run</li>
+<li>You want to give follow-up instructions on a previous session</li>
+<li>You stopped for lunch and want to continue</li>
+</ul>
+<h3>Chat Mode — Just Talk to the LLM</h3>
+<p>No agents, no planning, no orchestration. Just direct conversation with your configured LLM:</p>
+<pre lang="bash">interro-claw<span class="w"> </span>--chat
+</pre>
+<p>Maintains conversation history within the session. Useful for quick questions or debugging ideas.</p>
+<h3>MCP Server Mode — Use Interro-Claw from VS Code Copilot / Claude Desktop</h3>
+<p>MCP (Model Context Protocol) lets AI assistants like <strong>VS Code Copilot</strong> or <strong>Claude Desktop</strong> call Interro-Claw's tools directly from chat. Interro-Claw runs as a local subprocess — Copilot spawns it, sends JSON-RPC messages over stdin/stdout, and displays results.</p>
+<h4>Step 1: Install with MCP support</h4>
+<pre lang="bash">pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[mcp]"</span>
+</pre>
+<h4>Step 2: Configure VS Code</h4>
+<p>Create <code>.vscode/mcp.json</code> in your project:</p>
+<pre lang="json"><span class="p">{</span>
+<span class="w">  </span><span class="nt">"servers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"interro-claw"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"interro-claw"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"--mcp"</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"env"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"LLM_PROVIDER"</span><span class="p">:</span><span class="w"> </span><span class="s2">"claude"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"ANTHROPIC_API_KEY"</span><span class="p">:</span><span class="w"> </span><span class="s2">"${input:anthropicKey}"</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"inputs"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"anthropicKey"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"promptString"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Anthropic API key for Interro-Claw"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"password"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre>
+<p>For <strong>Claude Desktop</strong>, add to <code>claude_desktop_config.json</code>:</p>
+<pre lang="json"><span class="p">{</span>
+<span class="w">  </span><span class="nt">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"interro-claw"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"interro-claw"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"--mcp"</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"env"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"LLM_PROVIDER"</span><span class="p">:</span><span class="w"> </span><span class="s2">"claude"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"ANTHROPIC_API_KEY"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sk-ant-..."</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<h4>Step 3: Use it in chat</h4>
+<p>Once configured, Copilot sees Interro-Claw's 8 tools and <strong>automatically calls the right one</strong> based on what you type. Here's how each tool activates:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>What it does</th>
+<th>Copilot calls it when you say...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>interro_plan</code></td>
+<td>Deploys 9 agents with DAG scheduling to break a goal into parallel task batches</td>
+<td><em>"interro-claw plan a REST API"</em>, <em>"plan with agents"</em>, <em>"multi-agent plan"</em></td>
+</tr>
+<tr>
+<td><code>interro_execute</code></td>
+<td>Full autonomous build: plan → build → test → secure → refactor with blast-radius pruning and snapshot rollback</td>
+<td><em>"interro-claw build a REST API"</em>, <em>"autonomous build"</em>, <em>"build with agents"</em></td>
+</tr>
+<tr>
+<td><code>interro_chat</code></td>
+<td>Send a message to Interro-Claw's configured LLM (Claude/OpenAI/Ollama)</td>
+<td><em>"interro-claw chat"</em>, <em>"ask interro-claw"</em></td>
+</tr>
+<tr>
+<td><code>interro_analyze</code></td>
+<td>AST-level project analysis: languages, frameworks, dependency graph</td>
+<td><em>"interro-claw analyze this project"</em>, <em>"analyze with interro-claw"</em></td>
+</tr>
+<tr>
+<td><code>interro_blast_radius</code></td>
+<td>BFS traversal (4-depth) through dependency graph to find every affected file</td>
+<td><em>"blast radius of auth.py"</em>, <em>"what depends on this file?"</em>, <em>"impact analysis"</em></td>
+</tr>
+<tr>
+<td><code>interro_memory_recall</code></td>
+<td>Search Interro-Claw's persistent memory (past decisions, patterns, conventions)</td>
+<td><em>"what did interro-claw learn?"</em>, <em>"recall memory"</em>, <em>"what patterns were found?"</em></td>
+</tr>
+<tr>
+<td><code>interro_session_list</code></td>
+<td>List past sessions with IDs, goals, and status</td>
+<td><em>"show my interro-claw sessions"</em>, <em>"what did interro-claw run?"</em></td>
+</tr>
+<tr>
+<td><code>interro_telemetry</code></td>
+<td>Token savings report: cache hits, blast radius pruning, cost saved</td>
+<td><em>"how much did interro-claw save?"</em>, <em>"interro-claw telemetry"</em>, <em>"cache hit rate"</em></td>
+</tr>
+</tbody>
+</table>
+<h4>When does Copilot call Interro-Claw vs handle it itself?</h4>
+<p>Copilot's LLM reads each tool's description and decides whether it or an external tool is a better fit:</p>
+<table>
+<thead>
+<tr>
+<th>You type in Copilot chat</th>
+<th>What happens</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>"create a button component"</em></td>
+<td><strong>Copilot handles it</strong></td>
+<td>Simple single-file edit — Copilot can do this natively</td>
+</tr>
+<tr>
+<td><em>"use interro-claw to build a full-stack app"</em></td>
+<td><strong>Interro-Claw activates</strong></td>
+<td>Explicit mention of "interro-claw" matches tool triggers</td>
+</tr>
+<tr>
+<td><em>"plan this with agents"</em></td>
+<td><strong>Interro-Claw activates</strong></td>
+<td>Matches <code>interro_plan</code> trigger phrase "plan with agents"</td>
+</tr>
+<tr>
+<td><em>"what's the blast radius of changing auth.py?"</em></td>
+<td><strong>Interro-Claw activates</strong></td>
+<td>Only <code>interro_blast_radius</code> can do dependency impact analysis</td>
+</tr>
+<tr>
+<td><em>"build a REST API"</em></td>
+<td><strong>Copilot handles it</strong></td>
+<td>No explicit interro-claw mention; Copilot prefers its own tools</td>
+</tr>
+<tr>
+<td><em>"autonomous build of a microservice"</em></td>
+<td><strong>Interro-Claw activates</strong></td>
+<td>Matches <code>interro_execute</code> trigger "autonomous build"</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key rule:</strong> For reliable activation, include "interro-claw" or use unique phrases like "blast radius", "plan with agents", "autonomous build" in your prompt.</p>
+<h4>Example conversation in VS Code Copilot</h4>
+<pre><code>You:     "Use interro-claw to plan a REST API with user authentication"
+Copilot: [Calls interro_plan tool]
+         "Interro-Claw generated a 6-task plan:
+          Batch 0: ArchitectAgent — design system architecture
+          Batch 1: BackendAgent — implement endpoints + SecurityAgent — JWT auth
+          Batch 2: TestAgent — write integration tests
+          Batch 3: RefactorAgent — cleanup and optimization"
+
+You:     "Now execute that plan"
+Copilot: [Calls interro_execute tool]
+         "9 agents completed 6 tasks in 3 parallel batches.
+          Files written to artifacts/. Session ID: abc123"
+
+You:     "What's the blast radius if I change auth.py?"
+Copilot: [Calls interro_blast_radius tool]
+         "4 files affected: auth.py → routes.py → middleware.py → app.py"
+
+You:     "How much did that save in tokens?"
+Copilot: [Calls interro_telemetry tool]
+         "Cache hit rate: 68%. Tokens saved: ~51,000. Est. cost saved: $0.15"
+</code></pre>
+<blockquote>
+<p><strong>Note:</strong> Interro-Claw must be installed locally — the MCP server runs as a subprocess on your machine via stdio transport. Remote hosting (SSE/HTTP) is not yet supported.</p>
+</blockquote>
+<p>See <a href="README_FEATURES.md#what-is-mcp-model-context-protocol" rel="nofollow">README_FEATURES.md — MCP Integration</a> for the full technical deep-dive.</p>
+<h3>Memory Inspection CLI</h3>
+<p>Inspect and manage the SQLite memory database directly:</p>
+<pre lang="bash">python<span class="w"> </span>memory_cli.py<span class="w"> </span>stats<span class="w">              </span><span class="c1"># Memory statistics</span>
+python<span class="w"> </span>memory_cli.py<span class="w"> </span>recall<span class="w"> </span>AgentName<span class="w">   </span><span class="c1"># Recall agent-specific memory</span>
+python<span class="w"> </span>memory_cli.py<span class="w"> </span>knowledge<span class="w"> </span>--topic<span class="w"> </span>backend<span class="w">   </span><span class="c1"># Search shared knowledge</span>
+python<span class="w"> </span>memory_cli.py<span class="w"> </span>sessions<span class="w">           </span><span class="c1"># List all sessions</span>
+python<span class="w"> </span>memory_cli.py<span class="w"> </span>clear-cache<span class="w">        </span><span class="c1"># Clear response cache</span>
+</pre>
+<hr>
+<h2>CLI Reference</h2>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"&lt;goal&gt;"</code></td>
+<td>Single-shot: give a goal, get multi-agent orchestration</td>
+</tr>
+<tr>
+<td><code>--matrix-mode</code></td>
+<td>Persistent interactive session (goal/chat/clarify routing)</td>
+</tr>
+<tr>
+<td><code>--chat</code></td>
+<td>Pure LLM conversation (no agents)</td>
+</tr>
+<tr>
+<td><code>--project &lt;id&gt;</code></td>
+<td>Scope all memory and sessions to a named project</td>
+</tr>
+<tr>
+<td><code>--create-project</code></td>
+<td>Create a new project interactively</td>
+</tr>
+<tr>
+<td><code>--list-projects</code></td>
+<td>List all registered projects</td>
+</tr>
+<tr>
+<td><code>--resume &lt;id&gt;</code></td>
+<td>Resume a previous session by its ID</td>
+</tr>
+<tr>
+<td><code>--auto-resume</code></td>
+<td>Auto-resume the last incomplete session</td>
+</tr>
+<tr>
+<td><code>--get-session</code></td>
+<td>List recent session IDs (use with <code>--resume</code>)</td>
+</tr>
+<tr>
+<td><code>--stream</code></td>
+<td>Stream LLM tokens as they arrive</td>
+</tr>
+<tr>
+<td><code>--verbose</code> / <code>-v</code></td>
+<td>Detailed logs + telemetry at session end</td>
+</tr>
+<tr>
+<td><code>--mcp</code></td>
+<td>Run as MCP server (stdio transport)</td>
+</tr>
+<tr>
+<td><code>--version</code></td>
+<td>Print version</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>How It Works (30-Second Overview)</h2>
+<pre><code>You: "Build a REST API with auth"
+ │
+ ▼
+PlannerAgent → breaks goal into 6 tasks → assigns each to a specialist agent
+ │
+ ▼
+DAG Scheduler → runs independent agents in parallel batches
+ │
+ ├─ Batch 0: ArchitectAgent (system design)
+ ├─ Batch 1: BackendAgent + FrontendAgent (parallel)
+ ├─ Batch 2: TestAgent + SecurityAgent (parallel)
+ └─ Batch 3: RefactorAgent (cleanup)
+ │
+ ▼
+Each Agent: selects relevant files → calls LLM (cached) → uses tools → self-reflects → guardrails check
+ │
+ ▼
+Output: artifacts/ folder + session report + memory updated for next time
+</code></pre>
+<p>For the full architecture deep-dive, see <a href="README_ARCHITECTURE.md" rel="nofollow">README_ARCHITECTURE.md</a>.</p>
+<p>For every feature explained, competitive comparison, and MCP setup, see <a href="README_FEATURES.md" rel="nofollow">README_FEATURES.md</a>.</p>
+
