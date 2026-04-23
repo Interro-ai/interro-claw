@@ -57,7 +57,6 @@ Issues = "https://github.com/interro-claw/interro-claw/issues"
 
 [tool.setuptools.package-dir]
 interro_claw = "."
-
 [tool.setuptools]
 packages = [
     "interro_claw",
