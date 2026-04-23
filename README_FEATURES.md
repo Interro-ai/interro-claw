@@ -9,9 +9,9 @@
 
 > Quick-reference for users evaluating Interro-Claw. Each feature is explained in plain language so you know exactly what you're getting.
 
-### 1. Multi-LLM Provider Support (Claude / OpenAI / Ollama / NVIDIA NIM)
+### 1. Multi-LLM Provider Support (Claude / OpenAI / Ollama / NVIDIA NIM / Groq)
 
-Switch between cloud providers (Anthropic Claude, OpenAI GPT-4o) or run **fully local** with Ollama — zero cloud costs. NVIDIA NIM support lets enterprises use on-premise GPU clusters. You're never locked into a single vendor; change one env variable and your entire agent fleet switches models.
+Switch between cloud providers (Anthropic Claude, OpenAI GPT-4o, Groq) or run **fully local** with Ollama — zero cloud costs. NVIDIA NIM support lets enterprises use on-premise GPU clusters. Groq offers a free API tier for fast, cost-effective LLM access. You're never locked into a single vendor; change one env variable and your entire agent fleet switches models.
 
 ### 2. 9 Specialized Agents with DAG Scheduling
 
@@ -119,38 +119,38 @@ Expose all Interro-Claw capabilities as an MCP (Model Context Protocol) server. 
 
 How Interro-Claw compares against market alternatives across key dimensions:
 
-| #   | Feature                                              |    Interro-Claw     |    Devin     | GitHub Copilot Workspace | Cursor / Windsurf | AutoGen / CrewAI | Aider / SWE-Agent |   MetaGPT    |
-| --- | ---------------------------------------------------- | :-----------------: | :----------: | :----------------------: | :---------------: | :--------------: | :---------------: | :----------: |
-| 1   | **Multi-LLM Provider** (Claude/OpenAI/Ollama/NVIDIA) |   **4 providers**   |      1       |            1             |        1-2        |       2-3        |        1-2        |      1       |
-| 2   | **Specialized Agent Fleet** (9 domain experts)       |    **9 agents**     |  1 general   |        1 general         |     1 general     |  Generic roles   |      1 agent      |  5 generic   |
-| 3   | **DAG-Based Parallel Scheduling**                    |       **Yes**       |  Sequential  |        Sequential        |        N/A        |    Sequential    |    Sequential     |  Sequential  |
-| 4   | **3-Layer Memory** (STM/WM/LTM)                      |    **3 layers**     | Flat history |           None           |   Session only    |   Shared dict    |     Git-based     | Shared files |
-| 5   | **Blast-Radius Context Pruning**                     |   **BFS 4-depth**   |      No      |            No            |        No         |        No        |        No         |      No      |
-| 6   | **Incremental Graph Hashing** (SHA256)               |    **Per-file**     |      No      |            No            |        No         |        No        |        No         |      No      |
-| 7   | **2-Level Cache** (exact + fingerprint)              |       **Yes**       |      No      |            No            |        No         |        No        |        No         |      No      |
-| 8   | **Smart Model Routing** (complexity-based)           |     **3 tiers**     |    Fixed     |          Fixed           |       Fixed       |      Manual      |      Manual       |    Fixed     |
-| 9   | **AST-Aware Code Chunking**                          |       **Yes**       |  Line-based  |        Line-based        |    Line-based     |   No chunking    |    Line-based     |      No      |
-| 10  | **Agent Delegation** (blocking + async)              |       **Yes**       |     N/A      |           N/A            |        N/A        |      Basic       |        No         |   Limited    |
-| 11  | **Human-in-the-Loop** (risk scoring)                 |     **3 modes**     |    Manual    |        PR review         |      Manual       |        No        |        No         |      No      |
-| 12  | **Snapshot Rollback** (auto-revert)                  |       **Yes**       |      No      |        Git-based         |       Undo        |        No        |     Git-based     |      No      |
-| 13  | **4-Axis Result Verification**                       |       **Yes**       |      No      |            No            |        No         |        No        |        No         |      No      |
-| 14  | **Vector Memory** (no external deps)                 |    **Built-in**     |      No      |            No            |        No         |   Needs Chroma   |        No         |      No      |
-| 15  | **Self-Reflection Loop**                             |  **Yes (depth 3)**  |      No      |            No            |        No         |     Limited      |        No         |   Limited    |
-| 16  | **Skills System** (.md injection)                    |    **11 skills**    |  Hardcoded   |        Hardcoded         |     Hardcoded     |    Hardcoded     |      Config       |   Prompts    |
-| 17  | **Multi-Project Isolation**                          |       **Yes**       |   Per repo   |         Per repo         |     Per repo      |        No        |     Per repo      |      No      |
-| 18  | **Session Resume / Auto-Resume**                     |       **Yes**       |      No      |            No            |        No         |        No        |        No         |      No      |
-| 19  | **Matrix Mode** (interactive + agents)               |       **Yes**       |  Chat only   |        Plan only         |     Chat only     |   Script only    |     Chat only     |    Script    |
-| 20  | **CLI-First** (no IDE dependency)                    |       **Yes**       |   Browser    |         VS Code          |     IDE only      |      Python      |        CLI        |     CLI      |
-| 21  | **Local-First** (Ollama, zero cloud)                 |       **Yes**       |  Cloud only  |        Cloud only        |    Cloud only     |     Possible     |     Possible      |    Cloud     |
-| 22  | **Context Budget Enforcement**                       |       **Yes**       |      No      |         Unknown          |      Partial      |        No        |        No         |      No      |
-| 23  | **Streaming + Caching Combined**                     |       **Yes**       |      No      |           N/A            |    Stream only    |        No        |        No         |      No      |
-| 24  | **Sandboxed Execution**                              |       **Yes**       |    Docker    |        Codespace         |        No         |     Optional     |      Docker       |      No      |
-| 25  | **17 Anti-Pattern Guardrails**                       |       **Yes**       |      No      |            No            |        No         |        No        |        No         |      No      |
-| 26  | **Token Reduction Telemetry**                        |       **Yes**       |      No      |            No            |        No         |        No        |        No         |      No      |
-| 27  | **MCP Server** (tool provider)                       |       **Yes**       |      No      |            No            |        No         |        No        |        No         |      No      |
-| 28  | **Open Source & Model-Agnostic**                     |       **MIT**       |    Closed    |          Closed          |      Closed       |       MIT        |      Apache       |     MIT      |
-| 29  | **Cost**                                             | **Free + your LLM** |   $500/mo    |         Included         |     $20-40/mo     |       Free       |       Free        |     Free     |
-| 30  | **Pricing Lock-in**                                  |      **None**       |    Vendor    |          Vendor          |      Vendor       |       None       |       None        |     None     |
+| #   | Feature                                                   |        Interro-Claw         |    Devin     | GitHub Copilot Workspace | Cursor / Windsurf | AutoGen / CrewAI | Aider / SWE-Agent |   MetaGPT    |
+| --- | --------------------------------------------------------- | :-------------------------: | :----------: | :----------------------: | :---------------: | :--------------: | :---------------: | :----------: |
+| 1   | **Multi-LLM Provider** (Claude/OpenAI/Ollama/NVIDIA/Groq) |       **5 providers**       |      1       |            1             |        1-2        |       2-3        |        1-2        |      1       |
+| 2   | **Specialized Agent Fleet** (9 domain experts)            |        **9 agents**         |  1 general   |        1 general         |     1 general     |  Generic roles   |      1 agent      |  5 generic   |
+| 3   | **DAG-Based Parallel Scheduling**                         |           **Yes**           |  Sequential  |        Sequential        |        N/A        |    Sequential    |    Sequential     |  Sequential  |
+| 4   | **3-Layer Memory** (STM/WM/LTM)                           |        **3 layers**         | Flat history |           None           |   Session only    |   Shared dict    |     Git-based     | Shared files |
+| 5   | **Blast-Radius Context Pruning**                          |       **BFS 4-depth**       |      No      |            No            |        No         |        No        |        No         |      No      |
+| 6   | **Incremental Graph Hashing** (SHA256)                    |        **Per-file**         |      No      |            No            |        No         |        No        |        No         |      No      |
+| 7   | **2-Level Cache** (exact + fingerprint)                   |           **Yes**           |      No      |            No            |        No         |        No        |        No         |      No      |
+| 8   | **Smart Model Routing** (complexity-based)                |         **3 tiers**         |    Fixed     |          Fixed           |       Fixed       |      Manual      |      Manual       |    Fixed     |
+| 9   | **AST-Aware Code Chunking**                               |           **Yes**           |  Line-based  |        Line-based        |    Line-based     |   No chunking    |    Line-based     |      No      |
+| 10  | **Agent Delegation** (blocking + async)                   |           **Yes**           |     N/A      |           N/A            |        N/A        |      Basic       |        No         |   Limited    |
+| 11  | **Human-in-the-Loop** (risk scoring)                      |         **3 modes**         |    Manual    |        PR review         |      Manual       |        No        |        No         |      No      |
+| 12  | **Snapshot Rollback** (auto-revert)                       |           **Yes**           |      No      |        Git-based         |       Undo        |        No        |     Git-based     |      No      |
+| 13  | **4-Axis Result Verification**                            |           **Yes**           |      No      |            No            |        No         |        No        |        No         |      No      |
+| 14  | **Vector Memory** (no external deps)                      |        **Built-in**         |      No      |            No            |        No         |   Needs Chroma   |        No         |      No      |
+| 15  | **Self-Reflection Loop**                                  |      **Yes (depth 3)**      |      No      |            No            |        No         |     Limited      |        No         |   Limited    |
+| 16  | **Skills System** (.md injection)                         |        **11 skills**        |  Hardcoded   |        Hardcoded         |     Hardcoded     |    Hardcoded     |      Config       |   Prompts    |
+| 17  | **Multi-Project Isolation**                               |           **Yes**           |   Per repo   |         Per repo         |     Per repo      |        No        |     Per repo      |      No      |
+| 18  | **Session Resume / Auto-Resume**                          |           **Yes**           |      No      |            No            |        No         |        No        |        No         |      No      |
+| 19  | **Matrix Mode** (interactive + agents)                    |           **Yes**           |  Chat only   |        Plan only         |     Chat only     |   Script only    |     Chat only     |    Script    |
+| 20  | **CLI-First** (no IDE dependency)                         |           **Yes**           |   Browser    |         VS Code          |     IDE only      |      Python      |        CLI        |     CLI      |
+| 21  | **Local/Free-First** (Ollama, Groq, zero cloud)           |           **Yes**           |  Cloud only  |        Cloud only        |    Cloud only     |     Possible     |     Possible      |    Cloud     |
+| 22  | **Context Budget Enforcement**                            |           **Yes**           |      No      |         Unknown          |      Partial      |        No        |        No         |      No      |
+| 23  | **Streaming + Caching Combined**                          |           **Yes**           |      No      |           N/A            |    Stream only    |        No        |        No         |      No      |
+| 24  | **Sandboxed Execution**                                   |           **Yes**           |    Docker    |        Codespace         |        No         |     Optional     |      Docker       |      No      |
+| 25  | **17 Anti-Pattern Guardrails**                            |           **Yes**           |      No      |            No            |        No         |        No        |        No         |      No      |
+| 26  | **Token Reduction Telemetry**                             |           **Yes**           |      No      |            No            |        No         |        No        |        No         |      No      |
+| 27  | **MCP Server** (tool provider)                            |           **Yes**           |      No      |            No            |        No         |        No        |        No         |      No      |
+| 28  | **Open Source & Model-Agnostic**                          |           **MIT**           |    Closed    |          Closed          |      Closed       |       MIT        |      Apache       |     MIT      |
+| 29  | **Cost**                                                  | **Free + your LLM or Groq** |   $500/mo    |         Included         |     $20-40/mo     |       Free       |       Free        |     Free     |
+| 30  | **Pricing Lock-in**                                       |          **None**           |    Vendor    |          Vendor          |      Vendor       |       None       |       None        |     None     |
 
 ### What Only Interro-Claw Has (Market Firsts)
 

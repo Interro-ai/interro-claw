@@ -24,6 +24,7 @@
 orchestrator.py                    ← Master controller + DAG-aware task dispatcher
 ├── config.py                      ← All settings (LLM, memory, guardrails, ADS, etc.)
 ├── llm_client.py                  ← Unified Claude / OpenAI / Ollama / NVIDIA NIM
+├── llm_client.py                  ← Unified Claude / OpenAI / Ollama / NVIDIA NIM / Groq
 │                                     (2-level cache + retry + streaming)
 ├── memory.py                      ← SQLite memory (7 tables + vector search + projects)
 ├── telemetry.py                   ← Token reduction telemetry (6 metrics)
@@ -250,23 +251,24 @@ Supports **blocking** (wait for result) and **async** (fire-and-forget) modes. M
 
 ### Core Settings
 
-| Variable                    | Default | Description                               |
-| --------------------------- | ------- | ----------------------------------------- |
-| `LLM_PROVIDER`              | —       | `claude`, `openai`, `ollama`, or `nvidia` |
-| `ANTHROPIC_API_KEY`         | —       | API key for Claude                        |
-| `OPENAI_API_KEY`            | —       | API key for OpenAI                        |
-| `MAX_CONCURRENT_AGENTS`     | 4       | Parallel agent execution limit            |
-| `RATE_LIMIT_RPM`            | 30      | Token-bucket rate limit                   |
-| `ENABLE_RESPONSE_CACHE`     | 1       | Skip duplicate LLM calls                  |
-| `CACHE_TTL_SECONDS`         | 3600    | Cache expiry time                         |
-| `ENABLE_STREAMING`          | 0       | Stream LLM responses                      |
-| `MAX_REFLECTION_DEPTH`      | 3       | Max self-reflection iterations            |
-| `ENABLE_REFLECTION`         | 1       | Enable self-reflection loop               |
-| `MAX_TOKENS_PER_CALL`       | 4096    | Token budget per LLM call                 |
-| `MAX_CONTEXT_CHARS`         | 50000   | Context window budget                     |
-| `MAX_LLM_CALLS_PER_SESSION` | 200     | Session-wide LLM call limit               |
-| `MAX_OUTPUT_CHARS`          | 50000   | Max output size per agent                 |
-| `DEFAULT_PROJECT_ID`        | default | Memory scoping project ID                 |
+| Variable                    | Default | Description                                       |
+| --------------------------- | ------- | ------------------------------------------------- |
+| `LLM_PROVIDER`              | —       | `claude`, `openai`, `ollama`, or `nvidia`         |
+| `LLM_PROVIDER`              | —       | `claude`, `openai`, `ollama`, `nvidia`, or `groq` |
+| `ANTHROPIC_API_KEY`         | —       | API key for Claude                                |
+| `OPENAI_API_KEY`            | —       | API key for OpenAI                                |
+| `MAX_CONCURRENT_AGENTS`     | 4       | Parallel agent execution limit                    |
+| `RATE_LIMIT_RPM`            | 30      | Token-bucket rate limit                           |
+| `ENABLE_RESPONSE_CACHE`     | 1       | Skip duplicate LLM calls                          |
+| `CACHE_TTL_SECONDS`         | 3600    | Cache expiry time                                 |
+| `ENABLE_STREAMING`          | 0       | Stream LLM responses                              |
+| `MAX_REFLECTION_DEPTH`      | 3       | Max self-reflection iterations                    |
+| `ENABLE_REFLECTION`         | 1       | Enable self-reflection loop                       |
+| `MAX_TOKENS_PER_CALL`       | 4096    | Token budget per LLM call                         |
+| `MAX_CONTEXT_CHARS`         | 50000   | Context window budget                             |
+| `MAX_LLM_CALLS_PER_SESSION` | 200     | Session-wide LLM call limit                       |
+| `MAX_OUTPUT_CHARS`          | 50000   | Max output size per agent                         |
+| `DEFAULT_PROJECT_ID`        | default | Memory scoping project ID                         |
 
 ### ADS Settings
 
@@ -292,6 +294,7 @@ Supports **blocking** (wait for result) and **async** (fire-and-forget) modes. M
 | OpenAI     | `LLM_PROVIDER=openai` | `gpt-4o`                    |
 | Ollama     | `LLM_PROVIDER=ollama` | `llama3`                    |
 | NVIDIA NIM | `LLM_PROVIDER=nvidia` | (configured per deployment) |
+| Groq       | `LLM_PROVIDER=groq`   | `llama3-70b-8192`           |
 
 ---
 

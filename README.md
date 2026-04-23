@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Created by Interro-AI](https://img.shields.io/badge/Created%20by-Interro--AI-blue)](https://interro-ai.com)
 
-An open-source, multi-agent AI orchestrator that **plans, builds, tests, secures, refactors, and deploys** software projects from a single CLI command. Works with **Claude, OpenAI, Ollama, or NVIDIA NIM** — cloud or fully local.
+An open-source, multi-agent AI orchestrator that **plans, builds, tests, secures, refactors, and deploys** software projects from a single CLI command. Works with **Claude, OpenAI, Ollama, NVIDIA NIM, or Groq** — cloud, local, or free Groq API.
 
 | Doc                                                  | What's inside                                                                                                                 |
 | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
@@ -73,17 +73,18 @@ Interro-Claw needs **2 mandatory variables** to work. Everything else is optiona
 
 #### Required Variables
 
-| Variable                  | Description                                                 | Example       |
-| ------------------------- | ----------------------------------------------------------- | ------------- |
-| `LLM_PROVIDER`            | Which LLM to use: `openai`, `claude`, `ollama`, or `nvidia` | `openai`      |
-| API key for your provider | See table below                                             | `sk-proj-...` |
+| Variable                  | Description                                                         | Example       |
+| ------------------------- | ------------------------------------------------------------------- | ------------- |
+| `LLM_PROVIDER`            | Which LLM to use: `openai`, `claude`, `ollama`, `nvidia`, or `groq` | `openai`      |
+| API key for your provider | See table below                                                     | `sk-proj-...` |
 
-| Provider           | Required API Key Variable | Local?                |
+| Provider           | Required API Key Variable | Local? / Free?        |
 | ------------------ | ------------------------- | --------------------- |
 | OpenAI             | `OPENAI_API_KEY`          | No — cloud            |
 | Claude (Anthropic) | `CLAUDE_API_KEY`          | No — cloud            |
 | NVIDIA NIM         | `NVIDIA_API_KEY`          | No — cloud            |
 | Ollama             | _(none — no key needed)_  | **Yes — fully local** |
+| Groq               | `GROQ_API_KEY`            | **Yes — free tier**   |
 
 #### Option A: Create a .env file (recommended)
 
@@ -94,6 +95,10 @@ cp .env.example .env
 # Edit it — at minimum, set these two lines:
 # LLM_PROVIDER=openai
 # OPENAI_API_KEY=sk-proj-your-key-here
+# Or for Groq (free):
+# LLM_PROVIDER=groq
+# GROQ_API_KEY=your-groq-key-here
+# GROQ_MODEL=llama3-70b-8192
 ```
 
 #### Option B: Set environment variables directly
@@ -143,18 +148,20 @@ interro-claw --chat
 
 **LLM Configuration:**
 
-| Variable          | Default                               | Description                               |
-| ----------------- | ------------------------------------- | ----------------------------------------- |
-| `LLM_PROVIDER`    | _(required)_                          | `openai` / `claude` / `ollama` / `nvidia` |
-| `OPENAI_API_KEY`  | _(required for openai)_               | OpenAI API key                            |
-| `OPENAI_MODEL`    | `gpt-4o`                              | OpenAI model name                         |
-| `CLAUDE_API_KEY`  | _(required for claude)_               | Anthropic API key                         |
-| `CLAUDE_MODEL`    | `claude-sonnet-4-20250514`            | Claude model name                         |
-| `NVIDIA_API_KEY`  | _(required for nvidia)_               | NVIDIA NIM API key                        |
-| `NVIDIA_BASE_URL` | `https://integrate.api.nvidia.com/v1` | NVIDIA endpoint                           |
-| `NVIDIA_MODEL`    | `meta/llama-3.3-70b-instruct`         | NVIDIA model                              |
-| `OLLAMA_BASE_URL` | `http://localhost:11434`              | Ollama server URL                         |
-| `OLLAMA_MODEL`    | `llama3`                              | Ollama model name                         |
+| Variable          | Default                               | Description                                        |
+| ----------------- | ------------------------------------- | -------------------------------------------------- |
+| `LLM_PROVIDER`    | _(required)_                          | `openai` / `claude` / `ollama` / `nvidia` / `groq` |
+| `OPENAI_API_KEY`  | _(required for openai)_               | OpenAI API key                                     |
+| `OPENAI_MODEL`    | `gpt-4o`                              | OpenAI model name                                  |
+| `CLAUDE_API_KEY`  | _(required for claude)_               | Anthropic API key                                  |
+| `CLAUDE_MODEL`    | `claude-sonnet-4-20250514`            | Claude model name                                  |
+| `NVIDIA_API_KEY`  | _(required for nvidia)_               | NVIDIA NIM API key                                 |
+| `NVIDIA_BASE_URL` | `https://integrate.api.nvidia.com/v1` | NVIDIA endpoint                                    |
+| `NVIDIA_MODEL`    | `meta/llama-3.3-70b-instruct`         | NVIDIA model                                       |
+| `OLLAMA_BASE_URL` | `http://localhost:11434`              | Ollama server URL                                  |
+| `OLLAMA_MODEL`    | `llama3`                              | Ollama model name                                  |
+| `GROQ_API_KEY`    | _(required for groq)_                 | Groq API key                                       |
+| `GROQ_MODEL`      | `llama3-70b-8192`                     | Groq model name                                    |
 
 **Orchestrator:**
 
