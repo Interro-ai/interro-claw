@@ -65,9 +65,15 @@ DATA_DIR: str = os.getenv(
 )
 
 # ---------------------------------------------------------------------------
-# LLM provider selection  ("openai", "claude", "nvidia", "ollama")
+# LLM provider selection  ("openai", "claude", "nvidia", "ollama", "groq")
 # ---------------------------------------------------------------------------
 LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "")
+
+# ---------------------------------------------------------------------------
+# Groq API
+# ---------------------------------------------------------------------------
+GROQ_API_KEY: str = _strip_quotes(os.getenv("GROQ_API_KEY", ""))
+GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama3-70b-8192")
 
 # ---------------------------------------------------------------------------
 # API keys / endpoints
@@ -97,6 +103,7 @@ _PROVIDER_KEY_MAP: dict[str, str] = {
     "claude": "CLAUDE_API_KEY",
     "nvidia": "NVIDIA_API_KEY",
     "ollama": "",  # no key needed
+    "groq": "GROQ_API_KEY",
 }
 
 # ---------------------------------------------------------------------------
@@ -288,7 +295,7 @@ def ensure_llm_configured() -> None:
     # Interactive setup
     print("\n" + "=" * 60)
     print("  INTERRO-CLAW  —  First-Time Setup")
-    print("  by Interro-AI  •  interr-ai.com")
+    print("  by Interro-AI  •  interro-ai.com")
     print("=" * 60)
 
     if not LLM_PROVIDER:

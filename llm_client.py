@@ -351,11 +351,52 @@ class NvidiaClient(BaseLLMClient):
 
 # ── Factory ───────────────────────────────────────────────────────────────────
 
+
+# -- Groq API --------------------------------------------------------------
+class GroqClient(BaseLLMClient):
+    def __init__(self) -> None:
+        try:
+            import groq
+        except ImportError as exc:
+            raise ImportError("pip install groq") from exc
+        import interro_claw.config as config
+        if not config.GROQ_API_KEY:
+            raise ValueError("GROQ_API_KEY is not set")
+        self._client = groq.AsyncGroq(api_key=config.GROQ_API_KEY)
+        self._model = config.GROQ_MODEL
+
+    async def _raw_chat(self, system_prompt: str, user_message: str) -> str:
+        response = await self._client.chat.completions.create(
+            model=self._model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            max_tokens=4096,
+        )
+        return response.choices[0].message.content or ""
+
+    async def _raw_chat_stream(self, system_prompt: str, user_message: str) -> AsyncIterator[str]:
+        stream = await self._client.chat.completions.create(
+            model=self._model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            max_tokens=4096,
+            stream=True,
+        )
+        async for chunk in stream:
+            delta = chunk.choices[0].delta
+            if delta.content:
+                yield delta.content
+
 _PROVIDERS: dict[str, type[BaseLLMClient]] = {
     "claude": ClaudeClient,
     "openai": OpenAIClient,
     "ollama": OllamaClient,
     "nvidia": NvidiaClient,
+    "groq": GroqClient,
 }
 
 

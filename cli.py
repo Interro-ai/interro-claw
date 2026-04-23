@@ -48,7 +48,7 @@ def main() -> None:
         from interro_claw import __version__
         print(f"interro-claw {__version__}")
         print(f"https://github.com/interro-claw/interro-claw")
-        print(f"Created by Interro-AI  •  interr-ai.com")
+        print(f"Created by Interro-AI  •  interro-ai.com")
         return
 
     # --init: generate .env from bundled .env.example
@@ -221,14 +221,16 @@ def _init_env() -> None:
     # Interactive provider selection
     print("\n  Let's configure your LLM provider.")
     print("  (You can always edit .env later.)\n")
+
     print("    1. openai    — OpenAI GPT-4o  (requires API key)")
     print("    2. claude    — Anthropic Claude  (requires API key)")
     print("    3. nvidia    — NVIDIA NIM  (requires API key)")
     print("    4. ollama    — Local Ollama  (no API key, free)")
+    print("    5. groq      — Groq API (free tier, requires API key)")
     print()
 
-    providers = {"1": "openai", "2": "claude", "3": "nvidia", "4": "ollama"}
-    key_vars = {"openai": "OPENAI_API_KEY", "claude": "CLAUDE_API_KEY", "nvidia": "NVIDIA_API_KEY"}
+    providers = {"1": "openai", "2": "claude", "3": "nvidia", "4": "ollama", "5": "groq"}
+    key_vars = {"openai": "OPENAI_API_KEY", "claude": "CLAUDE_API_KEY", "nvidia": "NVIDIA_API_KEY", "groq": "GROQ_API_KEY"}
 
     pick = input("  Enter choice [1-4] (or press Enter to skip): ").strip()
     provider = providers.get(pick)
@@ -281,7 +283,7 @@ def _print_config_info(config) -> None:
     if os.path.exists(home_env):
         env_sources.append(f"HOME ({home_env})")
 
-    print(f"\n  interro-claw v{__version__}  •  by Interro-AI (interr-ai.com)")
+    print(f"\n  interro-claw v{__version__}  •  by Interro-AI (interro-ai.com)")
     print(f"  Provider : {config.LLM_PROVIDER or '<not set>'}")
     if env_sources:
         print(f"  .env from: {' > '.join(env_sources)}")

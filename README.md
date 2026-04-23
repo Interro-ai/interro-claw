@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/interro-claw.svg)](https://pypi.org/project/interro-claw/)
 [![Python](https://img.shields.io/pypi/pyversions/interro-claw.svg)](https://pypi.org/project/interro-claw/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Created by Interro-AI](https://img.shields.io/badge/Created%20by-Interro--AI-blue)](https://interr-ai.com)
+[![Created by Interro-AI](https://img.shields.io/badge/Created%20by-Interro--AI-blue)](https://interro-ai.com)
 
 An open-source, multi-agent AI orchestrator that **plans, builds, tests, secures, refactors, and deploys** software projects from a single CLI command. Works with **Claude, OpenAI, Ollama, or NVIDIA NIM** — cloud or fully local.
 

@@ -10,7 +10,7 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
 authors = [
-    {name = "Interro-AI", email = "contact@interr-ai.com"},
+    {name = "Interro-AI", email = "interro@interro-ai.com"},
 ]
 keywords = ["ai", "agents", "multi-agent", "orchestrator", "llm", "autonomous", "coding", "cli", "openai", "anthropic", "ollama"]
 classifiers = [
@@ -50,7 +50,7 @@ dev = [
 interro-claw = "interro_claw.cli:main"
 
 [project.urls]
-Homepage = "https://interr-ai.com"
+Homepage = "https://interro-ai.com"
 Repository = "https://github.com/interro-claw/interro-claw"
 Documentation = "https://github.com/interro-claw/interro-claw#readme"
 Issues = "https://github.com/interro-claw/interro-claw/issues"
