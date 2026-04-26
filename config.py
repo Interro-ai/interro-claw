@@ -304,11 +304,12 @@ def ensure_llm_configured() -> None:
         print("    2. claude    — Anthropic Claude  (requires API key)")
         print("    3. nvidia    — NVIDIA NIM free tier  (requires API key)")
         print("    4. ollama    — Local Ollama  (no API key, must be running)")
+        print("    5. groq      — Groq API (free tier, requires API key)")
         print()
 
-        choices = {"1": "openai", "2": "claude", "3": "nvidia", "4": "ollama"}
+        choices = {"1": "openai", "2": "claude", "3": "nvidia", "4": "ollama", "5": "groq"}
         while True:
-            pick = input("  Enter choice [1-4]: ").strip()
+            pick = input("  Enter choice [1-5]: ").strip()
             if pick in choices:
                 LLM_PROVIDER = choices[pick]
                 break
@@ -339,6 +340,8 @@ def ensure_llm_configured() -> None:
             CLAUDE_API_KEY = api_key
         elif LLM_PROVIDER == "nvidia":
             NVIDIA_API_KEY = api_key
+        elif LLM_PROVIDER == "groq":
+            GROQ_API_KEY = api_key
 
         print(f"  API key saved to {_ENV_FILE}")
 
@@ -354,6 +357,8 @@ def _has_api_key(provider: str) -> bool:
         return bool(CLAUDE_API_KEY)
     elif provider == "nvidia":
         return bool(NVIDIA_API_KEY)
+    elif provider == "groq":
+        return bool(GROQ_API_KEY)
     elif provider == "ollama":
         return True
     return False

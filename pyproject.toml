@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "interro-claw"
-version = "0.1.1"
+version = "0.1.2"
 description = "Autonomous Development System — multi-agent AI orchestrator that plans, builds, tests, and deploys software"
 readme = "README.md"
 license = "MIT"
